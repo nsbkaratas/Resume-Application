@@ -21,7 +21,9 @@
     "mysql": "^2.18.1",
     "parser": "^0.1.4",
     "pg": "^8.2.1",
-    "request": "^2.88.2"
+    "pg-hstore": "^2.3.3",
+    "request": "^2.88.2",
+    "sequelize": "^6.3.0"
   },
   "main": "app.js",
   "devDependencies": {},

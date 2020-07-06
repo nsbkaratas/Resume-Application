@@ -2,9 +2,16 @@
 var createError = require('http-errors');
 var express = require('express');
 var cors = require('cors');
+const bodyparser = require('body-parser');
+
+//database
+const db = require('./routes/config/db')
 
 
-
+//test db
+db.authenticate()
+.then(() => console.log('Database connected...'))
+.catch(err => console.log('error: ' + err))
 
 var app = express();
 
@@ -18,6 +25,9 @@ var usersRouter = require('./routes/users');
 const { allowedNodeEnvironmentFlags } = require('process');
 var whitelist = ['http://localhost:3000', 'localhost:9000/application']
 
+
+//routes
+app.use('/route', require('./routes/route'));
 
 app.use(cors());
 
