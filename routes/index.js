@@ -1,11 +1,21 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
+const router = express.Router();
+const Application =require('../database/models/applications');
+const cors = require('cors');
+
+router.use(cors());
+
+
+router.get('/getdata', async (req,res) => 
+   Application.findAll()
+   .then(apps => {
+       res.json({apps});
+       console.log('users', apps);
+   })
+   .catch(err => console.log(err))
+)
 
 
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
 
-module.exports = router;
+module.exports = router

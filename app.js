@@ -1,48 +1,76 @@
+const createError = require('http-errors');
+const session = require('express-session');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
+const applicationRouter = require('./modules/applications/controllers');
+const loginRouter= require("./modules/Managers/controllers")
+const cors = require('cors');
+const morgan = require('morgan');
+const app = express();
+const db = require('./database/index')
+const router = require('./routes/index')
 
-var createError = require('http-errors');
-var express = require('express');
-var cors = require('cors');
-const bodyparser = require('body-parser');
+app.use(router)
 
-//database
-const db = require('./routes/config/db')
-
-
-//test db
 db.authenticate()
-.then(() => console.log('Database connected...'))
-.catch(err => console.log('error: ' + err))
+  .then(() => console.log( 'Database connected...'))
+  .catch(err => console.log('Error' +(err)))
 
-var app = express();
-
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+app.get('/', (req, res) => res.send('index'))
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-const { allowedNodeEnvironmentFlags } = require('process');
-var whitelist = ['http://localhost:3000', 'localhost:9000/application']
-
-
-//routes
-app.use('/route', require('./routes/route'));
+/*const { allowedNodeEnvironmentFlags } = require('process');
+const whitelist = ['http://localhost:3000', 'localhost:9000/application']*/
 
 app.use(cors());
+
+
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+
+app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+
+  res.setHeader("Access-Control-Allow-Origin", "*");
+ 
+  res.setHeader(
+ 
+    "Access-Control-Allow-Headers",
+ 
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+ 
+  );
+ 
+  res.setHeader(
+ 
+    "Access-Control-Allow-Methods",
+ 
+    "GET, POST, PATCH, DELETE, OPTIONS, PUT"
+ 
+  );
+ 
+  next();
+ 
+ });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/application', usersRouter);
+
+app.use('/application', applicationRouter);
+app.use("/login", loginRouter);
+app.use('/gedata', require('./routes/index'));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -59,5 +87,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+//Fetching the users
+
 
 module.exports = app;
